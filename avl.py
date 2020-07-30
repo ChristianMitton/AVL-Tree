@@ -8,7 +8,7 @@
 # Through rotations they improve the worst case runtime of BST's (linear time), to logarithmic a runtime.
 # Rotations are always done on 3 nodes, regardless of position in tree
 
-#! Balance Factor
+#! Balance Factor (BF)
 # Each node has a balance facotor => height_of_left_subtree - height_of_right_subtree
 #                                 => balance_factor should be either -1, 0, 1
 #                                    => if the subtree has any other number, it is not balanced and must have rotations applied to it.
