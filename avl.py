@@ -33,7 +33,7 @@
 #? --------------------------------------------------------
 #? Left-Right-imbalance. (two step rotation)
 #? --------------------------------------------------------
-#       => perform right rotation on imbalanced node
+#       => perform left rotation on left child, then right rotation on root
 
 #                                            * rotation 1 (10 <-) *             * rotation 2 (30 ->) *                                 
 
@@ -53,7 +53,7 @@
 #? --------------------------------------------------------
 #? Right-Right-imbalance. (one step rotation)
 #? --------------------------------------------------------
-#       => perform right rotation on imbalanced node
+#       => perform left rotation on root
 
 #                                                           * rotation 1 (30 <-) *
 #
@@ -66,7 +66,7 @@
 #? --------------------------------------------------------
 #? Right-Left-imbalance. (two step rotation)
 #? --------------------------------------------------------
-#       => perform right rotation on imbalanced node
+#       => perform right rotation on right node, then left rotation on root
 
 #                                            * rotation 1 (10 ->) *             * rotation 2 (30 <-) *                                 
 
@@ -112,25 +112,83 @@ class Node:
         self.val = val
         self.left = None
         self.right = None
+        self.height = 1
 
 class AVL:
     def __init__(self):
         self.root = None
 
     def add(self, number):        
-        self.root = self.addHelper(self.root, number)
+        self.root = self.addHelper(self.root, number, 1)        
 
-    def addHelper(self, root, number):
-        if root == None:            
-            return Node(number)
-        
+    def addHelper(self, root, number, height):
+        if root == None:           
+            newNode = Node(number)            
+            newNode.height = height                                     
+            return newNode                
+
         if number < root.val:
-            root.left = self.addHelper(root.left, number)
+            root.left = self.addHelper(root.left, number, height)
         
         elif number >= root.val:
-            root.right = self.addHelper(root.right, number)
-        
-        return root            
+            root.right = self.addHelper(root.right, number, height)        
+
+        height_Of_Left = 0 if root.left == None else root.left.height
+        height_Of_Right = 0 if root.right == None else root.right.height
+
+        # update current root's height
+        root.height = self.calculateHeight(root)
+
+        balance_factor = height_Of_Left - height_Of_Right
+
+        # if there is an imbalance
+        if abs(balance_factor) > 1:
+            # Left Left
+            if balance_factor > 1 and number < root.left.val:
+                return self.leftRotate(root)                         
+            # Left Right
+            if balance_factor > 1 and number > root.left.val:
+                root.left = self.leftRotate(root.left)
+                return rightRotate(root)
+            # Right Right
+            if balance_factor < -1 and number > root.right.val:
+                return self.rightRotate(root)                
+            # Right Left
+            if balance_factor < -1 and number < root.right.val:                
+                root.right = self.rightRotate(root.right)
+                return self.leftRotate(root)
+                        
+        return root                
+
+    def leftRotate(self, root):
+        left, left_right = root.left, root.left.right        
+
+        left.right = root        
+        root.left = left_right
+
+        root.height = self.calculateHeight(root)
+        left.height = self.calculateHeight(left)
+
+        # left becomes new root
+        return left    
+
+    def rightRotate(self, root):
+        right, right_left = root.right, root.right.left
+
+        right.left = root
+        root.right = right_left
+
+        root.height = self.calculateHeight(root)
+        right.height = self.calculateHeight(right)
+
+        # right becomes new root
+        return right        
+
+    def calculateHeight(self, root):
+        height_Of_Left = 0 if root.left == None else root.left.height
+        height_Of_Right = 0 if root.right == None else root.right.height
+
+        return 1 + max(height_Of_Left, height_Of_Right)
 
     def inorder(self):
         self.inorderHelper(self.root)
@@ -144,6 +202,7 @@ class AVL:
         self.inorderHelper(root.right)    
 
 avl = AVL()
+# root
 avl.add(10)
 # left branch
 avl.add(5)
@@ -157,6 +216,5 @@ avl.add(12)
 avl.add(14)
 avl.add(22)
 # ----------------
-avl.inorder()
-avl.delete(10)
+print('In order')
 avl.inorder()
