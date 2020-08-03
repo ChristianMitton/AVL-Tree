@@ -20,6 +20,9 @@
 #? --------------------------------------------------------
 #? Left-Left-imbalance. (one step rotation)
 #? --------------------------------------------------------
+# Right rotation = clockwise
+# Left rotation = counter clockwise
+
 #       => perform right rotation on imbalanced node
 
 #                                            * rotation 1 (30 ->)*
